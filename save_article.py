@@ -14,24 +14,44 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+# 确保从脚本所在目录读取配置文件
+_SCRIPT_DIR = Path(__file__).parent.resolve()
+
 ILLEGAL_CHARS = r'[\\/:*?"<>|]'
+
+
+def _default_config() -> dict:
+    """当配置文件全部缺失时使用此默认配置"""
+    return {
+        "storage_dir": str(Path.home() / "Desktop" / "定时发布"),
+        "filename_prefix": True,
+    }
 TIMESTAMP = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 DATE_ONLY = datetime.now().strftime("%Y-%m-%d")
 
 
 def load_config(skill_json: str = "skill.json", config_json: str = "config.json") -> dict:
-    """优先读 skill.json，无则读 config.json"""
-    for path in [skill_json, config_json]:
-        if os.path.exists(path):
-            with open(path, "r", encoding="utf-8") as f:
+    """优先读 skill.json，无则读 config.json，优先用脚本同目录，再试当前目录"""
+    for cfg_name in [skill_json, config_json]:
+        # 1. 脚本同目录（git pull 更新后仍有效）
+        p = _SCRIPT_DIR / cfg_name
+        if p.exists():
+            with open(p, "r", encoding="utf-8") as f:
                 cfg = json.load(f)
-                # 统一映射
                 return {
                     "storage_dir": cfg.get("target_dir", "~/Desktop/定时发布/"),
                     "filename_prefix": cfg.get("filename_date_prefix", True),
                 }
-    # 兜底默认
-    return {"storage_dir": "~/Desktop/定时发布/", "filename_prefix": True}
+        # 2. 当前工作目录（兼容手动 cd 进去运行）
+        if os.path.exists(cfg_name):
+            with open(cfg_name, "r", encoding="utf-8") as f:
+                cfg = json.load(f)
+                return {
+                    "storage_dir": cfg.get("target_dir", "~/Desktop/定时发布/"),
+                    "filename_prefix": cfg.get("filename_date_prefix", True),
+                }
+    # 3. 全都找不到，使用默认
+    return _default_config()
 
 
 def sanitize_filename(title: str) -> str:
@@ -114,13 +134,13 @@ def main():
     parser.add_argument("--dir", "-d", help="直接指定输出目录（覆盖配置）")
     parser.add_argument(
         "--skill-json",
-        default="skill.json",
-        help="skill.json 路径（默认 skill.json）"
+        default=str(_SCRIPT_DIR / "skill.json"),
+        help="skill.json 路径（默认脚本同目录）"
     )
     parser.add_argument(
         "--config",
-        default="config.json",
-        help="config.json 路径（无 skill.json 时备用，默认 config.json）"
+        default=str(_SCRIPT_DIR / "config.json"),
+        help="config.json 路径（无 skill.json 时备用，默认脚本同目录）"
     )
     args = parser.parse_args()
 
