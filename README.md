@@ -1,106 +1,107 @@
-# topic-bank 选题库
+# 存入选题库
 
-> 把你读到的有价值的文章，一句话存进选题库。等需要写作的时候，打开文件夹，所有素材一目了然。
+> 把他人的好文章存进你的选题库
 
-## 快速开始
+把一篇文章（标题 + 正文）存入本地 Markdown 文件，支持自定义触发词和存放路径。
 
-### 第一步：安装
+---
 
-```bash
-git clone https://github.com/gusangciren/topic-bank.git
-cd topic-bank
-```
-
-### 第二步：配置（可选）
-
-编辑 `config.json`：
+## ⚙️ 可配置项
 
 ```json
 {
-  "storage_dir": "~/Desktop/定时发布/",
-  "filename_template": "{date}-{title}.md"
+  "trigger_words": ["存入选题库", "存入我的素材库"],
+  "target_dir": "~/Desktop/定时发布/",
+  "filename_date_prefix": true
 }
 ```
 
-| 参数 | 说明 | 默认值 |
-|------|------|--------|
-| `storage_dir` | 文章存放目录 | `~/Desktop/定时发布/` |
-| `filename_template` | 文件名模板，支持 `{date}` 和 `{title}` | `{date}-{title}.md` |
+- **`trigger_words`**：触发词列表，说任何一个都会激活本 skill，支持多个
+- **`target_dir`**：文章存入的文件夹路径（自动创建）
+- **`filename_date_prefix`**：true = 文件名以日期开头，false = 以标题开头
 
-### 第三步：保存文章
+---
 
-```bash
-python3 save_article.py --title "你的标题" --body "文章正文"
+## 使用方法
+
+在对话中发送 **触发词** + **文章内容**：
+
+```
+存入选题库
+
+标题：文章标题
+正文：这里是文章正文...
 ```
 
-也可以通过 **OpenClaw** 直接说：
+或者一行搞定：
 
-> 存入选题库，标题：xxx，正文：xxx
+```
+存入选题库
+标题：文章标题
+正文：这里是文章正文...
+```
 
----
-
-## 使用场景
-
-- 读公众号时发现好文章 → 存进选题库
-- 刷微博时看到金句 → 存进选题库
-- 写内容时缺素材 → 打开文件夹找灵感
+**注意**：正文是必填项，只发标题不发正文会提示补全。
 
 ---
 
-## 文件格式
+## 安装方式
 
-存入的文件长这样：
+### 方式一：Git clone（推荐）
+
+```bash
+git clone https://github.com/gusangciren/topic-bank.git \
+  ~/.qclaw/skills/topic-bank
+```
+
+### 方式二：手动下载
+
+1. 下载本仓库 ZIP
+2. 解压到 `~/.qclaw/skills/topic-bank/` 目录
+
+### 安装后
+
+1. 编辑 `SKILL.md` 中的 `⚙️ 可配置项` 区，设置你的触发词和存放路径
+2. 重启 AI assistant（或刷新 skill）
+
+---
+
+## 文件说明
+
+| 文件 | 作用 |
+|------|------|
+| `SKILL.md` | Skill 说明文件（可配置触发词） |
+| `save_article.py` | 核心脚本（零依赖） |
+| `config.json` | 配置文件（可改存放目录） |
+
+---
+
+## 存入的文章格式
 
 ```markdown
 # 文章标题
 
-文章正文内容，
-可以多行。
+> 来源：微信公众号/网站/书籍等
+> 存入时间：2026-04-27
+
+正文内容...
 
 ---
-来源：选题库
-存入时间：2026-04-27 19:55:00
+
+- 标签：
 ```
 
 ---
 
-## CLI 参数
+## 安全说明
 
-```
-python3 save_article.py [选项]
-
-必填：
-  --title, -t    文章标题
-  --body, -b     文章正文（支持多行）
-
-可选：
-  --config, -c   配置文件路径（默认 config.json）
-  --output, -o   直接指定输出目录（覆盖配置）
-```
+- 脚本仅做文件写入，不访问网络
+- 文件名自动处理特殊字符
+- 重名自动加 `-2.md` 序号，不覆盖已有文件
+- 零外部依赖，Python 3.6+ 内置库即可运行
 
 ---
 
-## 项目结构
+## 许可证
 
-```
-topic-bank/
-├── save_article.py    # 核心脚本
-├── config.json        # 用户配置
-├── README.md          # 本文档
-├── requirements.txt   # 依赖（无外部依赖，Python 内置库即可）
-└── .gitignore
-```
-
----
-
-## 与 OpenClaw 配合
-
-OpenClaw 用户可以在对话中直接说「存入选题库」并附上文章，AI 会自动调用本工具存入指定目录。
-
-触发词：**存入选题库**
-
----
-
-## License
-
-MIT
+MIT License · 欢迎 fork 和定制
