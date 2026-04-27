@@ -1,0 +1,8 @@
+{
+  "name": "存入选题库",
+  "version": "1.0.0",
+  "trigger_words": ["存入选题库", "存入我的素材库"],
+  "target_dir": "~/Desktop/定时发布/",
+  "filename_date_prefix": true,
+  "tags": []
+}
