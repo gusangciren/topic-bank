@@ -1,0 +1,4 @@
+{
+  "storage_dir": "~/Desktop/定时发布/",
+  "filename_template": "{date}-{title}.md"
+}
